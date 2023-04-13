@@ -16,6 +16,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.questdb:questdb:7.0.0'
+	implementation 'org.postgresql:postgresql:42.5.0'
 }
 
 tasks.named('test') {
