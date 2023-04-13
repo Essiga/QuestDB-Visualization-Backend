@@ -32,10 +32,10 @@ public class QuestDbRestController {
         final Connection connection = DriverManager.getConnection(
                 "jdbc:postgresql://"+ environment.getProperty("questdb.ipaddress") +"/qdb", properties);
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT * FROM example_table")) {
+                "SELECT * FROM energy_data")) {
             try (ResultSet rs = preparedStatement.executeQuery()) {
                 while (rs.next()) {
-                    System.out.println(rs.getLong(1));
+                    System.out.println(rs.getString(1));
                 }
             }
         }
