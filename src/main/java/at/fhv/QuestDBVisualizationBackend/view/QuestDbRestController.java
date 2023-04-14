@@ -1,6 +1,7 @@
 package at.fhv.QuestDBVisualizationBackend.view;
 
 
+import at.fhv.QuestDBVisualizationBackend.application.TimeFrameConverter;
 import at.fhv.QuestDBVisualizationBackend.application.dto.TimeFrameDTO;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,14 +29,6 @@ public class QuestDbRestController {
     private static final String MOVEMENT_GET_BY_TIMEFRAME = "/movement/getByTimeFrame";
     private static final String ENERGY_GET_BY_TIMEFRAME = "/energy/getByTimeFrame";
 
-    private long convertToEpochMicro(Instant time){
-        return TimeUnit.SECONDS.toMicros(time.getEpochSecond()) + TimeUnit.NANOSECONDS.toMicros(time.getNano());
-    }
-
-    private long convertToEpochNano(Instant time){
-        return TimeUnit.SECONDS.toNanos(time.getEpochSecond()) + (time.getNano());
-    }
-
 
     private Connection connectToQuestDB() throws SQLException {
         Properties properties = new Properties();
@@ -50,8 +43,10 @@ public class QuestDbRestController {
     @PostMapping(MOVEMENT_GET_BY_TIMEFRAME)
     public String getMovementDataByTimeFrame(@RequestBody TimeFrameDTO timeFrame) throws SQLException {
 
-        long epochStartDate = convertToEpochMicro(timeFrame.getStartDate());
-        long epochEndDate = convertToEpochMicro(timeFrame.getEndDate());
+        long epochStartDate = TimeFrameConverter.convertToEpochMicro(timeFrame.getStartDate());
+        long epochEndDate = TimeFrameConverter.convertToEpochMicro(timeFrame.getEndDate());
+
+        System.out.println(epochStartDate);
 
         JSONArray result;
 
@@ -69,10 +64,20 @@ public class QuestDbRestController {
     @PostMapping(ENERGY_GET_BY_TIMEFRAME)
     public String getEnergyDataByTimeFrame(@RequestBody TimeFrameDTO timeFrame) throws SQLException {
 
-        long epochStartDate = convertToEpochNano(timeFrame.getStartDate());
-        long epochEndDate = convertToEpochNano(timeFrame.getEndDate());
+        long epochStartDate = TimeFrameConverter.convertToEpochMilli(timeFrame.getStartDate());
+        long epochEndDate = TimeFrameConverter.convertToEpochMilli(timeFrame.getEndDate());
+
+
+
+        System.out.println("start before conversion: " + epochStartDate);
+        epochStartDate = (epochStartDate + 11644473600000L)*10000;
+        epochEndDate = (epochEndDate + 11644473600000L)*10000;
+
+        System.out.println("start after conversion: " + epochStartDate);
+        System.out.println(epochEndDate);
 
         JSONArray result;
+
 
         final Connection connection = connectToQuestDB();
 

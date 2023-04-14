@@ -1,6 +1,7 @@
 package at.fhv.QuestDBVisualizationBackend.view;
 
 
+import at.fhv.QuestDBVisualizationBackend.application.dto.TimeFrameDTO;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.*;
@@ -13,10 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -30,8 +28,10 @@ public class MongoDbRestController {
     @Autowired
     private Environment environment;
 
-    @GetMapping("/test")
-    public String test() {
+    private static final String GET_BY_TIMEFRAME = "getByTimeFrame";
+
+    @PostMapping(GET_BY_TIMEFRAME)
+    public String getDataByTimeFrame(TimeFrameDTO timeFrameDTO) {
         String connectionString = environment.getProperty("mongodb.connectionstring");
 
         MongoClientSettings settings = MongoClientSettings.builder()
@@ -44,8 +44,8 @@ public class MongoDbRestController {
         MongoCollection collection = db.getCollection("test");
 
         //Bson projectionFields = Projections.fields(Projections.include(""));
-//        Bson bsonFilter = Filters.gt("uid", "ESP32_Acc_01_1780832907");
-//        FindIterable<Document> findIt = collection.find(bsonFilter);
+        //Bson bsonFilter = Filters.gt("uid", "ESP32_Acc_01_1780832907");
+        //FindIterable<Document> findIt = collection.find(bsonFilter);
         FindIterable<Document> findIt = collection.find(new Document().append("battery", new Document().append("$gt", 39).append("$lt", 81)));
 
         JSONArray result = new JSONArray();
