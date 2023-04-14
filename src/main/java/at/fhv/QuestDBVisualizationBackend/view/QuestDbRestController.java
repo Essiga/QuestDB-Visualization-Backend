@@ -62,6 +62,7 @@ public class QuestDbRestController {
             result = executePreparedStatementForTimeFrame(epochStartDate, epochEndDate, preparedStatement);
         }
         connection.close();
+
         return result.toString();
     }
 
@@ -80,6 +81,7 @@ public class QuestDbRestController {
             result = executePreparedStatementForTimeFrame(epochStartDate, epochEndDate, preparedStatement);
         }
         connection.close();
+
         return result.toString();
     }
 
