@@ -1,20 +1,22 @@
 package at.fhv.QuestDBVisualizationBackend.view;
 
 
+import at.fhv.QuestDBVisualizationBackend.application.dto.TimeFrameDTO;
 import io.questdb.client.Sender;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.*;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -28,8 +30,21 @@ public class QuestDbRestController {
 
     private static final String TEST = "/test";
 
-    @GetMapping(TEST)
-    public String Test() throws SQLException {
+    private long convertToEpochMicro(Instant time){
+        return TimeUnit.SECONDS.toMicros(time.getEpochSecond()) + TimeUnit.NANOSECONDS.toMicros(time.getNano());
+    }
+
+    @PostMapping(TEST)
+    public String Test(@RequestBody TimeFrameDTO timeFrame) throws SQLException {
+
+        long epochStartDate = convertToEpochMicro(timeFrame.getStartDate());
+        long epochEndDate = convertToEpochMicro(timeFrame.getEndDate());
+
+
+        System.out.println("Debug:");
+        System.out.println("-------------------------------");
+        System.out.println("startDate: " + epochStartDate);
+        System.out.println("endDate: " + epochEndDate);
 
         JSONArray result = new JSONArray();
 
@@ -41,7 +56,9 @@ public class QuestDbRestController {
         final Connection connection = DriverManager.getConnection(
                 "jdbc:postgresql://"+ environment.getProperty("questdb.ipaddress") +"/qdb", properties);
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT * FROM energy_data")) {
+                "SELECT * FROM movement_data WHERE ValuesTS_PLC > ? AND ValuesTS_PLC < ?")) {
+            preparedStatement.setLong(1, epochStartDate);
+            preparedStatement.setLong(2, epochEndDate);
             try (ResultSet rs = preparedStatement.executeQuery()) {
                 ResultSetMetaData md = rs.getMetaData();
                 int numCols = md.getColumnCount();
