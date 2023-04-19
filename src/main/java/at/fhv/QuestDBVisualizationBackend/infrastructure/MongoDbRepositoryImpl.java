@@ -12,6 +12,9 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import org.bson.codecs.configuration.*;
+import org.bson.codecs.pojo.*;
+import org.bson.types.ObjectId;
 
 @Component
 public class MongoDbRepositoryImpl implements MongoDbRepository {
@@ -22,6 +25,7 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
     @Override
     public JSONArray getDataByEpochTime(long startTime, long endTime) {
         String connectionString = environment.getProperty("mongodb.connectionstring");
+
 
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(connectionString))
@@ -45,7 +49,7 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
         JSONArray result = new JSONArray();
 
         for (Document document : findIt) {
-            JSONObject row = new JSONObject(document);
+            JSONObject row = new JSONObject(document.toJson());
             result.put(row);
         }
 
