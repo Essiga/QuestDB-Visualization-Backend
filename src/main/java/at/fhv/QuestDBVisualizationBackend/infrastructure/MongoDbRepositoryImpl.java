@@ -4,7 +4,9 @@ import at.fhv.QuestDBVisualizationBackend.domain.repositories.MongoDbRepository;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.*;
+import com.mongodb.client.model.Filters;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +30,17 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
 
 
         MongoDatabase db = mongoClient.getDatabase("context_data");
-        MongoCollection collection = db.getCollection("test");
+        MongoCollection collection = db.getCollection("kuka_instructions");
 
         //Bson projectionFields = Projections.fields(Projections.include(""));
         //Bson bsonFilter = Filters.gt("uid", "ESP32_Acc_01_1780832907");
-        //FindIterable<Document> findIt = collection.find(bsonFilter);
-        FindIterable<Document> findIt = collection.find(new Document().append("battery", new Document().append("$gt", 39).append("$lt", 81)));
+        Bson bsonFilter = Filters.and(
+                Filters.eq("name", "execute"),
+                Filters.gte("serverTime.utcTime", startTime),
+                Filters.lte("serverTime.utcTime", endTime));
+        FindIterable<Document> findIt = collection.find(bsonFilter);
+        //FindIterable<Document> findIt = collection.find(new Document().append("battery", new Document().append("$gt", 39).append("$lt", 81)));
+        //FindIterable<Document> findIt = collection.find(new Document().append("name", new Document().append("$eq", "execute"), new Document().append("serverTime.utcTime", new Document().append("$gt", startTime))));
 
         JSONArray result = new JSONArray();
 

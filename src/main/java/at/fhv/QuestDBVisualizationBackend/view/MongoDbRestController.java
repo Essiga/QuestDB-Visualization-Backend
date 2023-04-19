@@ -1,5 +1,6 @@
 package at.fhv.QuestDBVisualizationBackend.view;
 
+import at.fhv.QuestDBVisualizationBackend.application.TimeFrameConverter;
 import at.fhv.QuestDBVisualizationBackend.application.dto.TimeFrameDTO;
 import at.fhv.QuestDBVisualizationBackend.domain.repositories.MongoDbRepository;
 import com.mongodb.ConnectionString;
@@ -27,9 +28,12 @@ public class MongoDbRestController {
     private static final String GET_BY_TIMEFRAME = "getByTimeFrame";
 
     @PostMapping(GET_BY_TIMEFRAME)
-    public String getDataByTimeFrame(TimeFrameDTO timeFrameDTO) {
-        //TODO: Edit once mongodb data is available
-        JSONArray result = mongoDbRepository.getDataByEpochTime(1, 1);
+    public String getDataByTimeFrame(@RequestBody TimeFrameDTO timeFrame) {
+
+        long epochStartDate = TimeFrameConverter.convertToEpochNano(timeFrame.getStartDate());
+        long epochEndDate = TimeFrameConverter.convertToEpochNano(timeFrame.getEndDate());
+
+        JSONArray result = mongoDbRepository.getDataByEpochTime(epochStartDate, epochEndDate);
         return result.toString();
     }
 }
