@@ -27,8 +27,6 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
     public JSONArray getDataByEpochTime(long startTime, long endTime) {
         String connectionString = environment.getProperty("mongodb.connectionstring");
 
-//        startTime = convertEnergyDataEpoch(startTime);
-//        endTime = convertEnergyDataEpoch(endTime);
 
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(connectionString))
@@ -39,23 +37,12 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
         MongoDatabase db = mongoClient.getDatabase("context_data");
         MongoCollection collection = db.getCollection("kuka_instructions");
 
-        //Bson projectionFields = Projections.fields(Projections.include(""));
-        //Bson bsonFilter = Filters.gt("uid", "ESP32_Acc_01_1780832907");
-//        Bson bsonFilter = Filters.and(
-//                Filters.eq("name", "execute"),
-//                Filters.gte("serverTime.utcTime", startTime),
-//                Filters.lte("serverTime.utcTime", endTime));
+
         BsonTimestamp startTimestamp = new BsonTimestamp((int) (startTime / 1000), (int) (endTime % 1000));
         BsonTimestamp endTimestamp = new BsonTimestamp((int) (endTime / 1000), (int) (endTime % 1000));
 
-//        ObjectId objectIdStartDate = new ObjectId(String.valueOf(startTimestamp));
-//        ObjectId objectIdEndDate = new ObjectId(String.valueOf(endTimestamp));
         ObjectId start = new ObjectId(startTimestamp.getTime(), startTimestamp.getInc());
         ObjectId end = new ObjectId(endTimestamp.getTime(), endTimestamp.getInc());
-
-//        Bson bsonFilter = Filters.gt("_id", start);
-
-        //Bson bsonFilter = Filters.gte("serverTime.utcTime", start);
 
         Bson bsonFilter = Filters.and(
                 Filters.eq("name", "execute"),
@@ -75,8 +62,4 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
         return result;
     }
 
-    private long convertEnergyDataEpoch(long date) {
-        date = (date + 11644473600000L)*10000;
-        return date;
-    }
 }
