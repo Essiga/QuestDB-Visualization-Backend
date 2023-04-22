@@ -30,8 +30,8 @@ public class MongoDbRestController {
     @PostMapping(GET_BY_TIMEFRAME)
     public String getDataByTimeFrame(@RequestBody TimeFrameDTO timeFrame) {
 
-        long epochStartDate = TimeFrameConverter.convertToEpochNano(timeFrame.getStartDate());
-        long epochEndDate = TimeFrameConverter.convertToEpochNano(timeFrame.getEndDate());
+        long epochStartDate = TimeFrameConverter.convertToEpochMilli(timeFrame.getStartDate());
+        long epochEndDate = TimeFrameConverter.convertToEpochMilli(timeFrame.getEndDate());
 
         JSONArray result = mongoDbRepository.getDataByEpochTime(epochStartDate, epochEndDate);
         return result.toString();
