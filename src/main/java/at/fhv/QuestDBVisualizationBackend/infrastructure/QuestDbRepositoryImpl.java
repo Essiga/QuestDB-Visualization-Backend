@@ -32,7 +32,7 @@ public class QuestDbRepositoryImpl implements QuestDbRepository {
         final Connection connection = connectToQuestDB();
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT Values_TS, Values_I_RMS FROM kuka_energy WHERE Values_TS > ? AND Values_TS < ?")) {
+                "SELECT Values_TS, Values_I_RMS, Values_W FROM kuka_energy WHERE Values_TS > ? AND Values_TS < ?")) {
             result = executePreparedStatementForTimeFrame(startDate, endDate, preparedStatement);
         }
         connection.close();
@@ -47,7 +47,7 @@ public class QuestDbRepositoryImpl implements QuestDbRepository {
         final Connection connection = connectToQuestDB();
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT Values_TS_PLC, Values_Actual_TCP_pose FROM kuka_assembly WHERE Values_TS_PLC > ? AND Values_TS_PLC < ?")) {
+                "SELECT Values_TS_PLC, Values_Actual_TCP_pose, Values_actual_torque FROM kuka_assembly WHERE Values_TS_PLC > ? AND Values_TS_PLC < ?")) {
             result = executePreparedStatementForTimeFrame(startDate, endDate, preparedStatement);
         }
         connection.close();

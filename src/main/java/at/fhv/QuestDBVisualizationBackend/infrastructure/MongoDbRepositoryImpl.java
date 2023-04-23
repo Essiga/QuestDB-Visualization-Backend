@@ -97,18 +97,18 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
                     Filters.eq("name", "trayPosCap"),
                     Filters.lte("_id", kukaInstruction.getMongoDbObjectId()));
             Bson sortDescendingId = Sorts.descending("_id");
-            FindIterable<Document> allTrayPosCap = collection.find(trayPosCapFilter);
+            FindIterable<Document> allTrayPosCap = collection.find(trayPosCapFilter).sort(sortDescendingId);
             for (Document doc: allTrayPosCap) {
                 System.out.println(((Document)doc.get("value")).getLong("value"));
             }
-            allTrayPosCap.sort(sortDescendingId);
+
             kukaInstruction.setTrayPosCap(((Document)allTrayPosCap.first().get("value")).getLong("value"));
 
             Bson trayPosCapBearing = Filters.and(
                     Filters.eq("name", "trayPosBearing"),
                     Filters.lte("_id", kukaInstruction.getMongoDbObjectId()));
-            FindIterable<Document> allTrayPosBearing = collection.find(trayPosCapBearing);
-            allTrayPosCap.sort(sortDescendingId);
+            FindIterable<Document> allTrayPosBearing = collection.find(trayPosCapBearing).sort(sortDescendingId);
+
             kukaInstruction.setTrayPosCap(((Document)allTrayPosBearing.first().get("value")).getLong("value"));
         }
 
