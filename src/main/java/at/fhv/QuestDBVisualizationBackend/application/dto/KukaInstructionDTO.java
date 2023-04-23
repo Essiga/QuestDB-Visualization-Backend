@@ -9,9 +9,11 @@ public class KukaInstructionDTO {
     private boolean value;
     private LocalDateTime sourceTime;
     private LocalDateTime serverTime;
-    private int trayPosCap;
-    private int trayPosBearing;
+    private long trayPosCap;
+    private long trayPosBearing;
     private ObjectId mongoDbObjectId;
+    private long startTimeStamp;
+    private long endTimeStamp;
 
     public String getName() {
         return name;
@@ -45,19 +47,19 @@ public class KukaInstructionDTO {
         this.serverTime = serverTime;
     }
 
-    public int getTrayPosCap() {
+    public long getTrayPosCap() {
         return trayPosCap;
     }
 
-    public void setTrayPosCap(int trayPosCap) {
+    public void setTrayPosCap(long trayPosCap) {
         this.trayPosCap = trayPosCap;
     }
 
-    public int getTrayPosBearing() {
+    public long getTrayPosBearing() {
         return trayPosBearing;
     }
 
-    public void setTrayPosBearing(int trayPosBearing) {
+    public void setTrayPosBearing(long trayPosBearing) {
         this.trayPosBearing = trayPosBearing;
     }
 
@@ -67,5 +69,21 @@ public class KukaInstructionDTO {
 
     public void setMongoDbObjectId(ObjectId mongoDbObjectId) {
         this.mongoDbObjectId = mongoDbObjectId;
+    }
+
+    public long getStartTimeStamp() {
+        return startTimeStamp;
+    }
+
+    public void setStartTimeStamp(long startTimeStamp) {
+        this.startTimeStamp = startTimeStamp;
+    }
+
+    public long getEndTimeStamp() {
+        return endTimeStamp;
+    }
+
+    public void setEndTimeStamp(long endTimeStamp) {
+        this.endTimeStamp = endTimeStamp;
     }
 }

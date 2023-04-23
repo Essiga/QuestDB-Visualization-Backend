@@ -5,7 +5,9 @@ import at.fhv.QuestDBVisualizationBackend.domain.repositories.MongoDbRepository;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.*;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
 import org.bson.BsonTimestamp;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -27,7 +29,7 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
 
 
     @Override
-    public JSONArray getDataByEpochTime(long startTime, long endTime) {
+    public List<KukaInstructionDTO> getDataByEpochTime(long startTime, long endTime) {
         String connectionString = environment.getProperty("mongodb.connectionstring");
 
 
@@ -66,9 +68,6 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
             kukaInstruction.setName(document.getString("name"));
             kukaInstruction.setMongoDbObjectId((ObjectId) document.get("_id"));
             kukaInstruction.setValue(((Document)document.get("value")).getBoolean("value"));
-            if(kukaInstructions.size() == 135){
-                System.out.println("now");
-            }
             kukaInstructions.add(kukaInstruction);
 
             JSONObject row = new JSONObject(document.toJson());
@@ -82,13 +81,35 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
         while(kukaInstructions.size() > counter){
             if(positiveFound == false && kukaInstructions.get(counter).getValue() == true){
                 positiveFound = true;
+                kukaInstructions.get(counter).setStartTimeStamp(kukaInstructions.get(counter).getMongoDbObjectId().getTimestamp());
                 relevantData.add(kukaInstructions.get(counter));
             } else if (positiveFound == true && kukaInstructions.get(counter).getValue() == false) {
                 positiveFound = false;
-                relevantData.add(kukaInstructions.get(counter));
+                relevantData.get(relevantData.size()-1).setEndTimeStamp(kukaInstructions.get(counter).getMongoDbObjectId().getTimestamp());
+                //relevantData.add(kukaInstructions.get(counter));
             }
             counter++;
 
+        }
+
+        for (KukaInstructionDTO kukaInstruction : relevantData) {
+            Bson trayPosCapFilter = Filters.and(
+                    Filters.eq("name", "trayPosCap"),
+                    Filters.lte("_id", kukaInstruction.getMongoDbObjectId()));
+            Bson sortDescendingId = Sorts.descending("_id");
+            FindIterable<Document> allTrayPosCap = collection.find(trayPosCapFilter);
+            for (Document doc: allTrayPosCap) {
+                System.out.println(((Document)doc.get("value")).getLong("value"));
+            }
+            allTrayPosCap.sort(sortDescendingId);
+            kukaInstruction.setTrayPosCap(((Document)allTrayPosCap.first().get("value")).getLong("value"));
+
+            Bson trayPosCapBearing = Filters.and(
+                    Filters.eq("name", "trayPosBearing"),
+                    Filters.lte("_id", kukaInstruction.getMongoDbObjectId()));
+            FindIterable<Document> allTrayPosBearing = collection.find(trayPosCapBearing);
+            allTrayPosCap.sort(sortDescendingId);
+            kukaInstruction.setTrayPosCap(((Document)allTrayPosBearing.first().get("value")).getLong("value"));
         }
 
 //        for (int i = 0; i < kukaInstructions.size(); i++) {
@@ -113,7 +134,7 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
 //            }
 //        }
 
-        return result;
+        return relevantData;
     }
 
 }
