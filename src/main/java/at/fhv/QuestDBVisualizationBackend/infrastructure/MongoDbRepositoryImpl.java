@@ -54,8 +54,6 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
                 Filters.gte("_id", start),
                 Filters.lte("_id", end));
         FindIterable<Document> findIt = collection.find(bsonFilter);
-        //FindIterable<Document> findIt = collection.find(new Document().append("battery", new Document().append("$gt", 39).append("$lt", 81)));
-        //FindIterable<Document> findIt = collection.find(new Document().append("name", new Document().append("$eq", "execute"), new Document().append("serverTime.utcTime", new Document().append("$gt", startTime))));
 
         JSONArray result = new JSONArray();
 
@@ -86,7 +84,6 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
             } else if (positiveFound == true && kukaInstructions.get(counter).getValue() == false) {
                 positiveFound = false;
                 relevantData.get(relevantData.size()-1).setEndTimeStamp(kukaInstructions.get(counter).getMongoDbObjectId().getTimestamp());
-                //relevantData.add(kukaInstructions.get(counter));
             }
             counter++;
 
@@ -98,9 +95,6 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
                     Filters.lte("_id", kukaInstruction.getMongoDbObjectId()));
             Bson sortDescendingId = Sorts.descending("_id");
             FindIterable<Document> allTrayPosCap = collection.find(trayPosCapFilter).sort(sortDescendingId);
-            for (Document doc: allTrayPosCap) {
-                System.out.println(((Document)doc.get("value")).getLong("value"));
-            }
 
             kukaInstruction.setTrayPosCap(((Document)allTrayPosCap.first().get("value")).getLong("value"));
 
@@ -111,28 +105,6 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
 
             kukaInstruction.setTrayPosBearing(((Document)allTrayPosBearing.first().get("value")).getLong("value"));
         }
-
-//        for (int i = 0; i < kukaInstructions.size(); i++) {
-////            if(kukaInstructions.get(i).getValue().equals("0")){
-////                kukaInstructions.remove(kukaInstructions.get(i));
-////            }
-//            while(positiveFound == false && kukaInstructions.size() > i) {
-//                if(kukaInstructions.get(i).getValue() == true){
-//                    relevantData.add(kukaInstructions.get(i));
-//                    positiveFound = true;
-//                } else {
-//                    i++;
-//                }
-//            }
-//            while (positiveFound == true && kukaInstructions.size() > i){
-//                if(kukaInstructions.get(i).getValue() == false){
-//                    relevantData.add(kukaInstructions.get(i));
-//                    positiveFound = false;
-//                } else {
-//                    i++;
-//                }
-//            }
-//        }
 
         return relevantData;
     }

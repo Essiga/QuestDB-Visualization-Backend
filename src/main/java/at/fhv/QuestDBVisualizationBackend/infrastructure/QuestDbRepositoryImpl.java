@@ -23,8 +23,8 @@ public class QuestDbRepositoryImpl implements QuestDbRepository {
     @Override
     public JSONArray getEnergyDataByEpochTime(long startDate, long endDate) throws SQLException {
 
-        startDate = convertEnergyDataEpoch(startDate);
-        endDate = convertEnergyDataEpoch(endDate);
+        startDate = convertEnergyDataEpoch(startDate-10000);
+        endDate = convertEnergyDataEpoch(endDate+10000);
 
         JSONArray result;
 
@@ -47,8 +47,8 @@ public class QuestDbRepositoryImpl implements QuestDbRepository {
         final Connection connection = connectToQuestDB();
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT Values_TS_PLC, Values_Actual_TCP_pose, Values_actual_torque FROM kuka_assembly WHERE Values_TS_PLC > ? AND Values_TS_PLC < ?")) {
-            result = executePreparedStatementForTimeFrame(startDate, endDate, preparedStatement);
+                "SELECT Values_TS_PLC, Values_actual_q, Values_actual_torque FROM kuka_assembly WHERE Values_TS_PLC > ? AND Values_TS_PLC < ?")) {
+            result = executePreparedStatementForTimeFrame(startDate-10000000, endDate+10000000, preparedStatement);
         }
         connection.close();
 
