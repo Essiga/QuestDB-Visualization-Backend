@@ -109,7 +109,7 @@ public class MongoDbRepositoryImpl implements MongoDbRepository {
                     Filters.lte("_id", kukaInstruction.getMongoDbObjectId()));
             FindIterable<Document> allTrayPosBearing = collection.find(trayPosCapBearing).sort(sortDescendingId);
 
-            kukaInstruction.setTrayPosCap(((Document)allTrayPosBearing.first().get("value")).getLong("value"));
+            kukaInstruction.setTrayPosBearing(((Document)allTrayPosBearing.first().get("value")).getLong("value"));
         }
 
 //        for (int i = 0; i < kukaInstructions.size(); i++) {
